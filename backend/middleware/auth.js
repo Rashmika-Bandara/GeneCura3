@@ -21,13 +21,16 @@ const getModelByRole = (role) => {
 // Protect routes - require authentication
 const protect = async (req, res, next) => {
   try {
-    let token;
 
-    // Get token from cookies
-    if (req.cookies && req.cookies.token) {
-      token = req.cookies.token;
+    let token = null;
+    // Get token from cookies (support both 'token' and 'auth_token')
+    if (req.cookies && (req.cookies.token || req.cookies.auth_token)) {
+      token = req.cookies.token || req.cookies.auth_token;
     }
-
+    // If not in cookies, check Authorization header
+    if (!token && req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
     if (!token) {
       return res.status(401).json({
         success: false,

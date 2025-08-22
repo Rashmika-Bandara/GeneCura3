@@ -79,8 +79,10 @@ const PatientForm = () => {
       toast.success('Patient created successfully')
       navigate('/dashboard/doctor/patients')
     },
-    onError: () => {
-      toast.error('Failed to create patient')
+    onError: (error) => {
+      // Show backend error message if available
+      const message = error?.response?.data?.message || error?.message || 'Failed to create patient';
+      toast.error(message);
     }
   })
 
@@ -93,8 +95,9 @@ const PatientForm = () => {
         toast.success('Patient updated successfully')
         navigate('/dashboard/doctor/patients')
       },
-      onError: () => {
-        toast.error('Failed to update patient')
+      onError: (error) => {
+        const message = error?.response?.data?.message || error?.message || 'Failed to update patient';
+        toast.error(message);
       }
     }
   )

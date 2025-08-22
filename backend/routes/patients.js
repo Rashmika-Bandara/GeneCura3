@@ -37,7 +37,7 @@ const patientValidation = [
 
 // Apply auth and audit middleware
 router.use(protect);
-router.use(authorize('doctor'));
+router.use(authorize('doctor', 'admin', 'geneticist'));
 router.use(createAuditTrail('Patient'));
 
 // @desc    Get all patients

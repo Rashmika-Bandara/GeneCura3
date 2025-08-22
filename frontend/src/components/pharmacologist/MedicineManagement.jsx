@@ -1,41 +1,33 @@
 import { useState } from 'react'
 import { Plus, Search } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { useQuery } from 'react-query'
+import { medicinesAPI } from '../../services/api'
 
 const MedicineManagement = () => {
   const [searchTerm, setSearchTerm] = useState('')
+  const navigate = useNavigate();
 
-  // Placeholder data - would come from API
-  const medicines = [
+  // Fetch medicines from backend and return an array of medicines (support both response shapes)
+  const { data, isLoading, isError } = useQuery(
+    'medicines',
+    () => medicinesAPI.getAll().then(res => res.data?.data?.medicines || res.data?.medicines || []),
     {
-      medicine_id: 'MED001',
-      name: 'Aspirin',
-      purpose: 'Pain relief and anti-inflammatory',
-      drug_interactions: 'Warfarin, Heparin',
-      allergy_risks: 'Salicylate sensitivity',
-      created_date: '2025-01-15'
-    },
-    {
-      medicine_id: 'MED002',
-      name: 'Lisinopril',
-      purpose: 'ACE inhibitor for hypertension',
-      drug_interactions: 'Potassium supplements, NSAIDs',
-      allergy_risks: 'ACE inhibitor cough',
-      created_date: '2025-01-14'
-    },
-    {
-      medicine_id: 'MED003',
-      name: 'Metformin',
-      purpose: 'Type 2 diabetes management',
-      drug_interactions: 'Alcohol, Contrast dyes',
-      allergy_risks: 'Lactic acidosis risk',
-      created_date: '2025-01-13'
+      retry: false,
+      onError: (error) => {
+        const message = error?.response?.data?.message || error?.message || 'Failed to load medicines';
+        // eslint-disable-next-line no-console
+        console.error('Medicines fetch error:', message);
+      }
     }
-  ]
+  );
+
+  const medicines = Array.isArray(data) ? data : [];
 
   const filteredMedicines = medicines.filter(medicine =>
-    medicine.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    medicine.medicine_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    medicine.purpose.toLowerCase().includes(searchTerm.toLowerCase())
+    medicine.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    medicine.medicine_id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (medicine.purpose?.toLowerCase().includes(searchTerm.toLowerCase()) || '')
   )
 
   return (
@@ -46,7 +38,10 @@ const MedicineManagement = () => {
           <h2 className="text-xl font-semibold text-gray-900">Medicine Management</h2>
           <p className="text-sm text-gray-600">Manage pharmaceutical database and drug information</p>
         </div>
-        <button className="btn-primary mt-4 sm:mt-0">
+        <button
+          className="btn-primary mt-4 sm:mt-0"
+          onClick={() => navigate('/dashboard/pharmacologist/add-medicine')}
+        >
           <Plus className="h-4 w-4 mr-2" />
           Add Medicine
         </button>
@@ -71,81 +66,47 @@ const MedicineManagement = () => {
         <div className="px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-medium text-gray-900">Medicines Database</h3>
         </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Medicine ID
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Purpose
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Interactions
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Allergy Risks
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Created
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredMedicines.map((medicine) => (
-                <tr key={medicine.medicine_id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {medicine.medicine_id}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <div className="font-medium">{medicine.name}</div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">
-                    <div className="max-w-xs truncate">
-                      {medicine.purpose}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">
-                    <div className="max-w-xs truncate">
-                      {medicine.drug_interactions || 'None known'}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">
-                    <div className="max-w-xs truncate">
-                      {medicine.allergy_risks || 'Standard precautions'}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {medicine.created_date}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex space-x-2">
-                      <button className="text-primary-600 hover:text-primary-900">
-                        View
-                      </button>
-                      <button className="text-primary-600 hover:text-primary-900">
-                        Edit
-                      </button>
-                      <button className="text-orange-600 hover:text-orange-900">
-                        Variations
-                      </button>
-                      <button className="text-red-600 hover:text-red-900">
-                        Delete
-                      </button>
-                    </div>
-                  </td>
+        {isLoading ? (
+          <div className="p-6 text-center text-gray-500">Loading medicines...</div>
+        ) : isError ? (
+          <div className="p-6 text-center text-red-600">Failed to load medicines.</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Medicine ID</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Purpose</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Interactions</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Allergy Risks</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredMedicines.map((medicine) => (
+                  <tr key={medicine.medicine_id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{medicine.medicine_id}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><div className="font-medium">{medicine.name}</div></td>
+                    <td className="px-6 py-4 text-sm text-gray-900"><div className="max-w-xs truncate">{medicine.purpose}</div></td>
+                    <td className="px-6 py-4 text-sm text-gray-900"><div className="max-w-xs truncate">{medicine.drug_interactions || 'None known'}</div></td>
+                    <td className="px-6 py-4 text-sm text-gray-900"><div className="max-w-xs truncate">{medicine.allergy_risks || 'Standard precautions'}</div></td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{medicine.created_date}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div className="flex space-x-2">
+                        <button className="text-primary-600 hover:text-primary-900">View</button>
+                        <button className="text-primary-600 hover:text-primary-900">Edit</button>
+                        <button className="text-orange-600 hover:text-orange-900">Variations</button>
+                        <button className="text-red-600 hover:text-red-900">Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   )
