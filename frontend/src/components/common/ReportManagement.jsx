@@ -81,7 +81,7 @@ const ReportManagement = ({ role }) => {
       </div>
 
       {/* Search and Filters */}
-      <div className="bg-white p-4 rounded-lg shadow-sm">
+     {/* <div className="bg-white p-4 rounded-lg shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="relative">
             <Search className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -106,7 +106,7 @@ const ReportManagement = ({ role }) => {
             </select>
           </div>
         </div>
-      </div>
+      </div>*/}
 
       {/* Reports List */}
       <div className="bg-white rounded-lg shadow-sm">

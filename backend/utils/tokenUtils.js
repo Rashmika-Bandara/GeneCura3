@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 
 const generateToken = (payload) => {
   return jwt.sign(payload, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE || '15m'
+  expiresIn: process.env.JWT_EXPIRE || '7d'
   });
 };
 
@@ -20,7 +20,8 @@ const setTokenCookies = (res, token, refreshToken) => {
     httpOnly: true,
     secure: isProduction,
     sameSite: process.env.COOKIE_SAME_SITE || 'lax',
-    maxAge: 15 * 60 * 1000 // 15 minutes
+  // default access token cookie lifetime set to 7 days for development
+  maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
   });
 
   // Set refresh token cookie

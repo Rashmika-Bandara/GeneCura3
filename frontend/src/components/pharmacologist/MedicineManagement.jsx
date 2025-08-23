@@ -6,6 +6,8 @@ import { medicinesAPI } from '../../services/api'
 
 const MedicineManagement = () => {
   const [searchTerm, setSearchTerm] = useState('')
+  const [editId, setEditId] = useState(null)
+  const [editForm, setEditForm] = useState({})
   const navigate = useNavigate();
 
   // Fetch medicines from backend and return an array of medicines (support both response shapes)
@@ -88,17 +90,117 @@ const MedicineManagement = () => {
                 {filteredMedicines.map((medicine) => (
                   <tr key={medicine.medicine_id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{medicine.medicine_id}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><div className="font-medium">{medicine.name}</div></td>
-                    <td className="px-6 py-4 text-sm text-gray-900"><div className="max-w-xs truncate">{medicine.purpose}</div></td>
-                    <td className="px-6 py-4 text-sm text-gray-900"><div className="max-w-xs truncate">{medicine.drug_interactions || 'None known'}</div></td>
-                    <td className="px-6 py-4 text-sm text-gray-900"><div className="max-w-xs truncate">{medicine.allergy_risks || 'Standard precautions'}</div></td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {editId === medicine.medicine_id ? (
+                        <input
+                          name="name"
+                          value={editForm?.name ?? medicine.name}
+                          onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))}
+                          className="form-input"
+                        />
+                      ) : (
+                        <div className="font-medium">{medicine.name}</div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-900">
+                      {editId === medicine.medicine_id ? (
+                        <input
+                          name="purpose"
+                          value={editForm?.purpose ?? medicine.purpose}
+                          onChange={e => setEditForm(f => ({ ...f, purpose: e.target.value }))}
+                          className="form-input"
+                        />
+                      ) : (
+                        <div className="max-w-xs truncate">{medicine.purpose}</div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-900">
+                      {editId === medicine.medicine_id ? (
+                        <input
+                          name="drug_interactions"
+                          value={editForm?.drug_interactions ?? medicine.drug_interactions}
+                          onChange={e => setEditForm(f => ({ ...f, drug_interactions: e.target.value }))}
+                          className="form-input"
+                        />
+                      ) : (
+                        <div className="max-w-xs truncate">{medicine.drug_interactions || 'None known'}</div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-900">
+                      {editId === medicine.medicine_id ? (
+                        <input
+                          name="allergy_risks"
+                          value={editForm?.allergy_risks ?? medicine.allergy_risks}
+                          onChange={e => setEditForm(f => ({ ...f, allergy_risks: e.target.value }))}
+                          className="form-input"
+                        />
+                      ) : (
+                        <div className="max-w-xs truncate">{medicine.allergy_risks || 'Standard precautions'}</div>
+                      )}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{medicine.created_date}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
-                        <button className="text-primary-600 hover:text-primary-900">View</button>
-                        <button className="text-primary-600 hover:text-primary-900">Edit</button>
-                        <button className="text-orange-600 hover:text-orange-900">Variations</button>
-                        <button className="text-red-600 hover:text-red-900">Delete</button>
+                        {editId === medicine.medicine_id ? (
+                          <>
+                            <button
+                              className="text-green-600 hover:text-green-900"
+                              onClick={async () => {
+                                try {
+                                  await medicinesAPI.update(medicine.medicine_id, {
+                                    medicine_id: medicine.medicine_id,
+                                    ...editForm
+                                  })
+                                  setEditId(null)
+                                  setEditForm({})
+                                  window.location.reload()
+                                } catch (err) {
+                                  alert('Failed to update medicine')
+                                }
+                              }}
+                            >
+                              Save
+                            </button>
+                            <button
+                              className="text-gray-600 hover:text-gray-900"
+                              onClick={() => { setEditId(null); setEditForm({}) }}
+                            >
+                              Cancel
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              className="text-primary-600 hover:text-primary-900"
+                              onClick={() => {
+                                setEditId(medicine.medicine_id)
+                                setEditForm({
+                                  name: medicine.name || '',
+                                  purpose: medicine.purpose || '',
+                                  drug_interactions: medicine.drug_interactions || '',
+                                  allergy_risks: medicine.allergy_risks || '',
+                                })
+                              }}
+                            >
+                              Edit
+                            </button>
+                            <button
+                              className="text-red-600 hover:text-red-900"
+                              onClick={async () => {
+                                if (window.confirm(`Are you sure you want to delete ${medicine.name}?`)) {
+                                  try {
+                                    await medicinesAPI.delete(medicine.medicine_id)
+                                    window.location.reload()
+                                  } catch (err) {
+                                    alert('Failed to delete medicine')
+                                  }
+                                }
+                              }}
+                            >
+                              Delete
+                            </button>
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>

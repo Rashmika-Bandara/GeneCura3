@@ -87,16 +87,16 @@ const TreatmentAnalysis = () => {
           <h2 className="text-xl font-semibold text-gray-900">Treatment Analysis</h2>
           <p className="text-sm text-gray-600">Analyze treatment effectiveness across genetic profiles</p>
         </div>
-        <button
+        {/* <button
           onClick={handleExportCSV}
           className="btn-secondary mt-4 sm:mt-0"
         >
           <Download className="h-4 w-4 mr-2" />
           Export CSV
-        </button>
+        </button> */}
       </div>
 
-      {/* Filters */}
+    {/* Filters 
       <div className="bg-white p-6 rounded-lg shadow-sm">
         <div className="flex items-center mb-4">
           <Filter className="h-5 w-5 text-gray-400 mr-2" />
@@ -171,7 +171,7 @@ const TreatmentAnalysis = () => {
             </select>
           </div>
         </div>
-      </div>
+      </div>    */}
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">

@@ -40,7 +40,7 @@ const PrescriptionManagement = () => {
         </button>
       </div>
 
-      {/* Search */}
+      {/* Search 
       <div className="bg-white p-4 rounded-lg shadow-sm">
         <div className="relative max-w-md">
           <Search className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -52,7 +52,7 @@ const PrescriptionManagement = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-      </div>
+      </div>*/}
 
       {/* Prescriptions List */}
       <div className="bg-white rounded-lg shadow-sm">
