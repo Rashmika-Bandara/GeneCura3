@@ -214,7 +214,7 @@ const MetabolizerManagement = () => {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-1">Report ID</label>
-                <div className="text-gray-900">{viewReport.analysis_report_id}</div>
+                <div className="text-gray-900">{viewReport.metabolizer_id}</div>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Gene</label>
@@ -226,7 +226,7 @@ const MetabolizerManagement = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Description</label>
-                <div className="text-gray-900">{viewReport.description}</div>
+                <div className="text-gray-900">{viewReport.notes || '-'}</div>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Created At</label>
