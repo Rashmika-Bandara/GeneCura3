@@ -104,6 +104,8 @@ app.use('/api/v1/prescriptions', prescriptionRoutes);
 app.use('/api/v1/reports', reportRoutes);
 app.use('/api/v1/treatment-cases', treatmentCaseRoutes);
 app.use('/api/v1/admin', adminRoutes);
+const variationAnalysisRoutes = require('./routes/variationAnalysis');
+app.use('/api/v1/variation-analysis', variationAnalysisRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

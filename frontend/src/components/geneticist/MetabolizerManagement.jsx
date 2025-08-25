@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect } from 'react'
 import { Plus } from 'lucide-react'
 
@@ -14,6 +12,7 @@ const MetabolizerManagement = () => {
     status_label: '',
     notes: ''
   })
+  const [viewReport, setViewReport] = useState(null)
 
   // Fetch all genes on mount
   useEffect(() => {
@@ -174,6 +173,7 @@ const MetabolizerManagement = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -191,12 +191,54 @@ const MetabolizerManagement = () => {
                     <div className="max-w-xs truncate">{md.notes}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{md.createdAt?.slice(0,10) || '-'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <button
+                      className="btn-secondary flex items-center"
+                      onClick={() => setViewReport(md)}
+                    >
+                      View
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </div>
+
+      {/* View Report Modal */}
+      {viewReport && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold mb-4">View Metabolizer Report</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Report ID</label>
+                <div className="text-gray-900">{viewReport.analysis_report_id}</div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Gene</label>
+                <div className="text-gray-900">{viewReport.gene_id || '-'}</div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Status</label>
+                <div className="text-gray-900">{viewReport.status_label || '-'}</div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Description</label>
+                <div className="text-gray-900">{viewReport.description}</div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Created At</label>
+                <div className="text-gray-900">{viewReport.createdAt?.slice(0,10) || '-'}</div>
+              </div>
+            </div>
+            <div className="flex justify-end mt-6">
+              <button className="btn-secondary" onClick={() => setViewReport(null)}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
